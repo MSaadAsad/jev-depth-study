@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "jevprobe"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+  "torch>=2.7",
+  "transformers>=5.17,<6",
+  "numpy>=1.26",
+  "scikit-learn>=1.4",
+  "jevk5 @ git+https://github.com/allebee/jevk5@v0.3.3",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-m 'not model'"
+markers = ["model: downloads and runs a real pretrained model (slow)"]
