@@ -5,3 +5,18 @@ __pycache__/
 /runs/
 .pytest_cache/
 .superpowers/
+
+# Publish selected source, reports and figures only.
+.env
+.env.*
+*.pem
+*.key
+*.json
+*.jsonl
+/output/
+/blog-draft/
+/blog-draft-v2/
+*.safetensors
+*.pt
+*.npz
+.DS_Store

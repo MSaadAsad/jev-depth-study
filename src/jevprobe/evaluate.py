@@ -15,6 +15,7 @@ import json
 import math
 import os
 from pathlib import Path
+import re
 import time
 
 import torch
@@ -38,6 +39,10 @@ def source_digest() -> str:
 
 
 def resolve_revision(repo: str, revision: str | None) -> str:
+    # A full Hub commit id is already immutable; resolving it again only adds an
+    # unnecessary network dependency to otherwise fully cached offline runs.
+    if revision and re.fullmatch(r"[0-9a-fA-F]{40}", revision):
+        return revision.lower()
     resolved = HfApi().model_info(repo, revision=revision).sha
     if not resolved:
         raise ValueError("evaluation requires a Hub model with an immutable commit revision")

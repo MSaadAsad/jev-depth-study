@@ -63,9 +63,11 @@ def layout(ex, tok):
             "rendered": r, "prompt_sha256": digest(r.text.encode())}
 
 
-def prepare(n_per_depth, seed):
+def prepare(n_per_depth, seed, *, ds=range(1, 7), fixed_depth=False):
     tok = AutoTokenizer.from_pretrained(MODEL, revision=REVISION, local_files_only=True)
-    pairs = build_pairs(n_per_depth, "test", seed, aligned=token_aligned(tok))
+    aligned = token_aligned(tok)
+    pairs = build_pairs(n_per_depth, "test", seed, ds=ds,
+                        aligned=lambda a, b: (not fixed_depth or a.d == b.d) and aligned(a, b))
     cases = []
     for clean, cf in pairs:
         a, b = layout(clean, tok), layout(cf, tok)
@@ -105,6 +107,7 @@ def prepare(n_per_depth, seed):
                       "counterfactual": cf.to_dict(), "prompt_hashes": [a["prompt_sha256"], b["prompt_sha256"]],
                       "positions": {k: [a["groups"][k], b["groups"][k]] for k in GROUPS}})
     return {"schema": 1, "model": MODEL, "revision": REVISION, "layers": list(LAYERS),
+            "fixed_counterfactual_depth": fixed_depth,
             "groups": list(GROUPS), "n_per_depth": n_per_depth, "seed": seed,
             "cases": cases, "source_sha256": source_digest(),
             "script_sha256": digest(Path(__file__).read_bytes()),

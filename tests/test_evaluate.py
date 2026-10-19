@@ -22,6 +22,12 @@ def test_revision_resolved_from_hub_not_transformers_config(monkeypatch):
     assert evaluate.resolve_revision("test/model", "v1") == "immutable"
 
 
+def test_pinned_full_commit_does_not_need_hub(monkeypatch):
+    monkeypatch.setattr(evaluate, "HfApi", lambda: pytest.fail("network lookup for immutable commit"))
+    sha = "C4F7FDB3AEAB5582336406E78D3BEF11BF98833D"
+    assert evaluate.resolve_revision("test/model", sha) == sha.lower()
+
+
 @pytest.mark.parametrize("dtype", [torch.float32, torch.bfloat16])
 def test_direct_score_matches_captured_readout_without_lm_head(dtype):
     torch.manual_seed(8)
